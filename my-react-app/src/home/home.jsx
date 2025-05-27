@@ -16,11 +16,11 @@ function Home() {
     async function getPokemon(){
 
       //asynchronously grab the data for the pokemon
-      const response = await fetch("https://pokeapi.co/api/v2/pokemon/raichu");
+      const response = await fetch("https://pokeapi.co/api/v2/pokemon/regice");
       const pokejson = await response.json();
 
       //2nd pokemon data
-      const response2 = await fetch("https://pokeapi.co/api/v2/pokemon/groudon");
+      const response2 = await fetch("https://pokeapi.co/api/v2/pokemon/dialga");
       const pokejson2 = await response2.json();
 
 
@@ -76,6 +76,10 @@ function Home() {
       </>
     )
 
+    function returnType(typing){
+
+    }
+
   }
 
   return (
@@ -83,10 +87,10 @@ function Home() {
   <>
   <div class="container">
     <div class="row">
-      <div class="col-4 d-flex flex-column border">
+      <div class="col-4 border">
         <div><span class="align-text-top"><h4>{pokedata.name}</h4></span></div>
         <div><img src={pokedata["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} class="img-fluid sprite" /></div>
-        <div>
+        <div class="align-items-bottom">
           <div class="row">
             <div class="col-3">HP</div>
             <div class="col-6" id="bar_handler">
@@ -131,10 +135,10 @@ function Home() {
           </div>
         </div>
       </div>
-      <div class="col-4 d-flex flex-column border">
+      <div class="col-4 border">
         <div><span class="align-text-top"><h4>{pokedata2.name}</h4></span></div>
         <div><img src={pokedata2["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} class="img-fluid sprite"/></div>
-        <div>
+        <div class="align-items-bottom">
           <div class="row">
             <div class="col-3">HP</div>
             <div class="col-6" id="bar_handler">
@@ -179,7 +183,29 @@ function Home() {
           </div>
         </div>
       </div>
-      <div class="col-6"></div>
+      <div class="col-4 border">
+        Hello
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-8 border">
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/> 
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-8 border">
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+      </div>
     </div>
   </div>
   </>
@@ -187,3 +213,5 @@ function Home() {
 }
 
 export default Home
+/*
+*/

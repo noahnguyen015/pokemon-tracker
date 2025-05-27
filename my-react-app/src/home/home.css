@@ -11,11 +11,23 @@
 }
 
 .sprite{
-    width: 50%;
-    height: 100%;
+    width: 150px;
+    height: 140px;
+}
+
+.sprite2{
+    width: 100px;
+    height: 100px;
 }
 
 .border{
+    border: solid;
     border-radius: 10px;
-    border-color: white;
 }
+
+.border2{
+    border: solid;
+}
+
+
+
