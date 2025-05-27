@@ -10,6 +10,12 @@
     padding-right: 0;
 }
 
-.text{
-    
+.sprite{
+    width: 50%;
+    height: 100%;
+}
+
+.border{
+    border-radius: 10px;
+    border-color: white;
 }

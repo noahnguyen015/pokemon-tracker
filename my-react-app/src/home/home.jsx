@@ -16,11 +16,11 @@ function Home() {
     async function getPokemon(){
 
       //asynchronously grab the data for the pokemon
-      const response = await fetch("https://pokeapi.co/api/v2/pokemon/sneasel");
+      const response = await fetch("https://pokeapi.co/api/v2/pokemon/raichu");
       const pokejson = await response.json();
 
       //2nd pokemon data
-      const response2 = await fetch("https://pokeapi.co/api/v2/pokemon/krookodile");
+      const response2 = await fetch("https://pokeapi.co/api/v2/pokemon/groudon");
       const pokejson2 = await response2.json();
 
 
@@ -42,16 +42,18 @@ function Home() {
     let rounded = 0;
     
     if(stat_value >= 150){
+      //just make it 100% if it's larger than 150
       rounded = 100;
     }
     else{
-    
+      //find the rounded percentage out of 150 for the width
       const barwidth = stat_value/150;
       rounded = Math.round(barwidth*100);
     }
 
     let color = "";
 
+    //grab the color for the bar based on the value
     if(stat_value < 25)
       color = "#bd1818";
     else if(stat_value < 50)
@@ -65,6 +67,7 @@ function Home() {
     else
       color = "#0e7aac";
 
+    //convert num to percent string
     const result = String(rounded) + "%";
 
     return (
@@ -80,10 +83,10 @@ function Home() {
   <>
   <div class="container">
     <div class="row">
-      <div class="col-3 d-flex flex-column justify-content-end">
-        <div><img src={pokedata["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} class="img-fluid" /></div>
+      <div class="col-4 d-flex flex-column border">
+        <div><span class="align-text-top"><h4>{pokedata.name}</h4></span></div>
+        <div><img src={pokedata["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} class="img-fluid sprite" /></div>
         <div>
-          Stats
           <div class="row">
             <div class="col-3">HP</div>
             <div class="col-6" id="bar_handler">
@@ -128,9 +131,10 @@ function Home() {
           </div>
         </div>
       </div>
-      <div class="col-3 d-flex flex-column justify-content-end">
-        <div><img src={pokedata2["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} class="img-fluid"/></div>
-        <div>Stats
+      <div class="col-4 d-flex flex-column border">
+        <div><span class="align-text-top"><h4>{pokedata2.name}</h4></span></div>
+        <div><img src={pokedata2["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} class="img-fluid sprite"/></div>
+        <div>
           <div class="row">
             <div class="col-3">HP</div>
             <div class="col-6" id="bar_handler">
