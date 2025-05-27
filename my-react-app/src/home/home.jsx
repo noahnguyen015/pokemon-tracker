@@ -4,23 +4,23 @@ import './home.css'
 
 function Home() {
 
-  //state for both the 1st & 2nd pokemon data (set to null originally)
-  //pokedata will hold the data for the state
+  //state htmlFor both the 1st & 2nd pokemon data (set to null originally)
+  //pokedata will hold the data htmlFor the state
   //setPokedata updates the pokedata
   const [pokedata, setPokedata] = useState(null);
   const [pokedata2, setPokedata2] = useState(null);
 
-  //useEffect for obtaining data from PokeAPI asynchronously
+  //useEffect htmlFor obtaining data from PokeAPI asynchronously
   //runs after component renders
   useEffect(() => {
     async function getPokemon(){
 
-      //asynchronously grab the data for the pokemon
-      const response = await fetch("https://pokeapi.co/api/v2/pokemon/regice");
+      //asynchronously grab the data htmlFor the pokemon
+      const response = await fetch("https://pokeapi.co/api/v2/pokemon/sandile");
       const pokejson = await response.json();
 
       //2nd pokemon data
-      const response2 = await fetch("https://pokeapi.co/api/v2/pokemon/dialga");
+      const response2 = await fetch("https://pokeapi.co/api/v2/pokemon/larvitar");
       const pokejson2 = await response2.json();
 
 
@@ -34,8 +34,8 @@ function Home() {
 
   if(!pokedata) return <p>Loading ..</p>;
 
-  console.log(pokedata);
-  console.log(pokedata2);
+//  console.log(pokedata);
+//  console.log(pokedata2);
 
   function Stat_Bar({stat_value}){
 
@@ -46,14 +46,14 @@ function Home() {
       rounded = 100;
     }
     else{
-      //find the rounded percentage out of 150 for the width
+      //find the rounded percentage out of 150 htmlFor the width
       const barwidth = stat_value/150;
       rounded = Math.round(barwidth*100);
     }
 
     let color = "";
 
-    //grab the color for the bar based on the value
+    //grab the color htmlFor the bar based on the value
     if(stat_value < 25)
       color = "#bd1818";
     else if(stat_value < 50)
@@ -75,136 +75,187 @@ function Home() {
       <div id="stat_bar" style={{ width: result, backgroundColor: color}}></div>
       </>
     )
+  }
+  
+  function returnType(typing){
 
-    function returnType(typing){
+  }
 
-    }
+  function Routes() {
+
+    const[routedata, setRoute] = useState(null);
+
+    useEffect(() => {
+
+      async function getRoutes(){
+
+        //asynchronously grab the data htmlFor the pokemon
+        const response = await fetch("https://pokeapi.co/api/v2/region/unova/");
+        const all_routes = await response.json();
+
+        setRoute(all_routes);
+
+      }
+      getRoutes();
+
+    },[]);
+
+      let locations = [];
+
+      if(routedata){
+        locations = routedata.locations;
+        //take the arguments of 
+        locations = locations.sort((a,b) => {
+          if(a.name < b.name)
+            return -1
+          if(a.name > b.name) 
+            return 1;
+
+          return 0;
+        });
+      }
+
+      return (
+        <>
+        <select>
+          {locations && locations.map((route, i) => <option key={i}>{route.name}</option>)}
+        </select>
+        </>
+      );
 
   }
 
   return (
   //parent element (React Fragments) <> & </>:) 
   <>
-  <div class="container">
-    <div class="row">
-      <div class="col-4 border">
-        <div><span class="align-text-top"><h4>{pokedata.name}</h4></span></div>
-        <div><img src={pokedata["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} class="img-fluid sprite" /></div>
-        <div class="align-items-bottom">
-          <div class="row">
-            <div class="col-3">HP</div>
-            <div class="col-6" id="bar_handler">
+  <div className="container">
+    <div className="row">
+      <div className="col-4 border">
+        <div><span className="align-text-top"><h4>{pokedata.name}</h4></span></div>
+        <div><img src={pokedata["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} className="img-fluid sprite" /></div>
+        <div className="d-flex flex-column align-items-bottom">
+          <div className="row">
+            <div className="col-3">HP</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata.stats[0].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata.stats[0].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata.stats[0].base_stat}</div>
           </div>
-          <div class="row">
-            <div class="col-3">Attack</div>
-            <div class="col-6" id="bar_handler">
+          <div className="row">
+            <div className="col-3">Attack</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata.stats[1].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata.stats[1].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata.stats[1].base_stat}</div>
           </div>
-          <div class="row">
-            <div class="col-3">Defense</div>
-            <div class="col-6" id="bar_handler">
+          <div className="row">
+            <div className="col-3">Defense</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata.stats[2].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata.stats[2].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata.stats[2].base_stat}</div>
           </div>
-          <div class="row">
-            <div class="col-3">Sp. Atk</div>
-            <div class="col-6" id="bar_handler">
+          <div className="row">
+            <div className="col-3">Sp. Atk</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata.stats[3].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata.stats[3].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata.stats[3].base_stat}</div>
           </div>
-          <div class="row">
-            <div class="col-3">Sp. Def</div>
-            <div class="col-6" id="bar_handler">
+          <div className="row">
+            <div className="col-3">Sp. Def</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata.stats[4].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata.stats[4].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata.stats[4].base_stat}</div>
           </div>
-          <div class="row">
-            <div class="col-3">Speed</div>
-            <div class="col-6" id="bar_handler">
+          <div className="row">
+            <div className="col-3">Speed</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata.stats[5].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata.stats[5].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata.stats[5].base_stat}</div>
           </div>
         </div>
       </div>
-      <div class="col-4 border">
-        <div><span class="align-text-top"><h4>{pokedata2.name}</h4></span></div>
-        <div><img src={pokedata2["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} class="img-fluid sprite"/></div>
-        <div class="align-items-bottom">
-          <div class="row">
-            <div class="col-3">HP</div>
-            <div class="col-6" id="bar_handler">
+      <div className="col-4 border">
+        <div><span className="align-text-top"><h4>{pokedata2.name}</h4></span></div>
+        <div><img src={pokedata2["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} className="img-fluid sprite"/></div>
+        <div className="d-flex flex-column align-items-bottom">
+          <div className="row">
+            <div className="col-3">HP</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata2.stats[0].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata2.stats[0].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[0].base_stat}</div>
           </div>
-          <div class="row">
-            <div class="col-3">Attack</div>
-            <div class="col-6" id="bar_handler">
+          <div className="row">
+            <div className="col-3">Attack</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata2.stats[1].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata2.stats[1].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[1].base_stat}</div>
           </div>
-          <div class="row">
-            <div class="col-3">Defense</div>
-            <div class="col-6" id="bar_handler">
+          <div className="row">
+            <div className="col-3">Defense</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata2.stats[2].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata2.stats[2].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[2].base_stat}</div>
           </div>
-          <div class="row">
-            <div class="col-3">Sp. Atk</div>
-            <div class="col-6" id="bar_handler">
+          <div className="row">
+            <div className="col-3">Sp. Atk</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata2.stats[3].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata2.stats[3].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[3].base_stat}</div>
           </div>
-          <div class="row">
-            <div class="col-3">Sp. Def</div>
-            <div class="col-6" id="bar_handler">
+          <div className="row">
+            <div className="col-3">Sp. Def</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata2.stats[4].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata2.stats[4].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[4].base_stat}</div>
           </div>
-          <div class="row">
-            <div class="col-3">Speed</div>
-            <div class="col-6" id="bar_handler">
+          <div className="row">
+            <div className="col-3">Speed</div>
+            <div className="col-6" id="bar_handler">
               <Stat_Bar stat_value={pokedata2.stats[5].base_stat}/>
             </div>
-            <div class="col-3 d-flex justify-content-start">{pokedata2.stats[5].base_stat}</div>
+            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[5].base_stat}</div>
           </div>
         </div>
       </div>
-      <div class="col-4 border">
-        Hello
+      <div className="col-4 border">
+        <form className="d-flex flex-column justify-content-start align-items-start">
+          <label htmlFor="pokemon1">Pokemon 1</label>
+          <input type="text" id="pokemon1"></input>
+          <label htmlFor="pokemon2"> Pokemon 2</label>
+          <input type="text" id="pokemon2"></input>
+          <label htmlFor="route"> Choose a Route</label>
+            <Routes/>
+          <input type="submit" value ="Enter" className="mt-2"></input>
+        </form>
       </div>
     </div>
-    <div class="row">
-      <div class="col-8 border">
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/> 
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+    <div className="row">
+      <div className="col-8 border">
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/> 
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
       </div>
     </div>
-    <div class="row">
-      <div class="col-8 border">
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} class="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+    <div className="row">
+      <div className="col-8 border">
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
       </div>
     </div>
   </div>
