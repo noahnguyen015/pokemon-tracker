@@ -1,6 +1,15 @@
 #stat_bar{
-    background-color: green;
     border-radius: 20px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    height: 40%;
+}
+
+#bar_handler{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.text{
+    
 }
