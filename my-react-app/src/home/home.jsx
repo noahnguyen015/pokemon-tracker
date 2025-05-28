@@ -16,11 +16,11 @@ function Home() {
     async function getPokemon(){
 
       //asynchronously grab the data htmlFor the pokemon
-      const response = await fetch("https://pokeapi.co/api/v2/pokemon/sandile");
+      const response = await fetch("https://pokeapi.co/api/v2/pokemon/salamence");
       const pokejson = await response.json();
 
       //2nd pokemon data
-      const response2 = await fetch("https://pokeapi.co/api/v2/pokemon/larvitar");
+      const response2 = await fetch("https://pokeapi.co/api/v2/pokemon/blissey");
       const pokejson2 = await response2.json();
 
 
@@ -34,7 +34,7 @@ function Home() {
 
   if(!pokedata) return <p>Loading ..</p>;
 
-//  console.log(pokedata);
+  console.log(pokedata);
 //  console.log(pokedata2);
 
   function Stat_Bar({stat_value}){
@@ -77,8 +77,23 @@ function Home() {
     )
   }
   
-  function returnType(typing){
+  function ReturnType({types}){
 
+    console.log(types);
+
+    if(types.length == 1){
+      return (
+      <>
+        <div>{types[0]["type"]["name"]}</div>
+      </>)
+    }else{
+      return(
+      <>
+        <div>{types[0]["type"]["name"]}/{types[1]["type"]["name"]}</div>
+      </>)
+      
+    }
+  
   }
 
   function Routes() {
@@ -89,7 +104,7 @@ function Home() {
 
       async function getRoutes(){
 
-        //asynchronously grab the data htmlFor the pokemon
+        //asynchronously grab the data htmlFor the routes from a region
         const response = await fetch("https://pokeapi.co/api/v2/region/unova/");
         const all_routes = await response.json();
 
@@ -100,21 +115,22 @@ function Home() {
 
     },[]);
 
+      //use array to hold all locations
       let locations = [];
 
       if(routedata){
         locations = routedata.locations;
-        //take the arguments of 
+        //take the arguments of sort and overwrite for custom function for names
         locations = locations.sort((a,b) => {
           if(a.name < b.name)
             return -1
           if(a.name > b.name) 
             return 1;
-
           return 0;
         });
       }
 
+      //map all location values to an index for iteration, then return option with the route name
       return (
         <>
         <select>
@@ -132,6 +148,7 @@ function Home() {
     <div className="row">
       <div className="col-4 border">
         <div><span className="align-text-top"><h4>{pokedata.name}</h4></span></div>
+        <ReturnType types={pokedata.types}/>
         <div><img src={pokedata["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} className="img-fluid sprite" /></div>
         <div className="d-flex flex-column align-items-bottom">
           <div className="row">
@@ -180,6 +197,7 @@ function Home() {
       </div>
       <div className="col-4 border">
         <div><span className="align-text-top"><h4>{pokedata2.name}</h4></span></div>
+        <ReturnType types={pokedata2.types}/>
         <div><img src={pokedata2["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} className="img-fluid sprite"/></div>
         <div className="d-flex flex-column align-items-bottom">
           <div className="row">
