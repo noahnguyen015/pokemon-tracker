@@ -1,10 +1,11 @@
 // Login.js
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 //login component
 const Login = () => {
+  const navigate = useNavigate();
   //formData data holds username & password
   //setFormData updates form when user types
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -38,11 +39,13 @@ const Login = () => {
 
       //if the login was successful
       if (res.ok) {
+        console.log(data)
         //save access & refresh JWT tokens in localStorage
         //update message ot show a welcome messge
         localStorage.setItem('access', data.access);
         localStorage.setItem('refresh', data.refresh);
         setMessage('Logged in as ' + data.username);
+        navigate("/");
       } else {
         //otherwise show error message (400, 401)
         setMessage('Login failed: ' + JSON.stringify(data));

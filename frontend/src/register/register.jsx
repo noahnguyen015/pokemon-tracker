@@ -1,9 +1,10 @@
 // Register.js
 //most is identical to login other than a few thngs
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [message, setMessage] = useState('');
 
@@ -31,6 +32,7 @@ const Register = () => {
       if (res.ok) {
         //display message
         setMessage(data.message); // "User registered successfully"
+        navigate("/login");
       } else {
         //display error if didn't work
         setMessage('Registration failed: ' + JSON.stringify(data));

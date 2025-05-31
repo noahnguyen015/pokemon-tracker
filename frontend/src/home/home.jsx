@@ -1,16 +1,23 @@
 import { isValidElement, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './home.css'
 
-/*used for login, this is how the backend knows the user is logged in
-const token = localStorage.getItem('access');
+function Logout(){
+  //hooks have to be called at top of react functions/components not nested functions/conditions
+  const navigate = useNavigate();
 
-const res = await fetch('http://localhost:8000/api/protected-endpoint/', {
-  method: 'GET',
-  headers: {
-    'Authorization': `Bearer ${token}`,
-  },
-});
-*/
+  function logoutSubmit() {
+
+    // Remove tokens from localStorage
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+
+    // Redirect to login page
+    navigate('/login', { replace: true });
+  }
+  return <button onClick={logoutSubmit}>Logout</button>
+}
+
 function Home() {
 
   fetch('http://localhost:8000/api/hello/')
@@ -158,6 +165,7 @@ function Home() {
   //parent element (React Fragments) <> & </>:) 
   <>
   <div className="container">
+    <Logout/>
     <div className="row">
       <div className="col-4 border">
         <div><span className="align-text-top"><h4>{pokedata.name}</h4></span></div>

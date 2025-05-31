@@ -3,6 +3,8 @@ from django.shortcuts import render
 # Create your views here.
 #apiview - 
 from rest_framework.decorators import api_view
+#allows login view unauthorized access
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 #base class for making classbased views in Django REST Framework
@@ -23,6 +25,9 @@ def hello_world(request):
 #make class-based view on registration
 #for only POST
 class RegisterView(APIView):
+
+    permission_classes = [AllowAny]
+
 #runs when frontend sends a post request to /api/registers
     def post(self, request):
         #takes incoming JSON and puts it into serializer
@@ -39,11 +44,16 @@ class RegisterView(APIView):
 
 #for logging in
 class LoginView(APIView):
+
     #POST request done to /api/login
     def post(self, request):
         #pass login data to serializer
         serializer = LoginSerializer(data=request.data)
         #check if credentials correct
+
+        if not serializer.is_valid():
+            print(serializer.errors)
+
         if serializer.is_valid():
             #if successful object return by validate() to serializer
             user = serializer.validated_data
@@ -55,5 +65,8 @@ class LoginView(APIView):
                 'access': str(refresh.access_token),
                 'username': user.username
             })
+        else:
+            print("Incoming data:", request.data)
+            print("Serializer errors:", serializer.errors)
         #fail response (invalid login)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
