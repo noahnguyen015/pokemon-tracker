@@ -1,6 +1,7 @@
 // Register.js
 //most is identical to login other than a few thngs
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Register = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -48,6 +49,7 @@ const Register = () => {
         <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
         <button type="submit">Register</button>
       </form>
+      <p>Already Have an Account? <Link to="/login">Login</Link></p>
       <p>{message}</p>
     </div>
   );

@@ -1,5 +1,7 @@
 // Login.js
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+
 
 //login component
 const Login = () => {
@@ -62,6 +64,7 @@ const Login = () => {
         <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
         <button type="submit">Login</button>
       </form>
+      <p>New Account? <Link to="/register">Register</Link></p>
       <p>{message}</p>
     </div>
   );
