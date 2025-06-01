@@ -8,6 +8,7 @@ const Register = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [message, setMessage] = useState('');
 
+
   const handleChange = e => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };

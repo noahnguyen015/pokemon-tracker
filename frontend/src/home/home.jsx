@@ -2,6 +2,8 @@ import { isValidElement, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './home.css'
 
+
+
 function Logout(){
   //hooks have to be called at top of react functions/components not nested functions/conditions
   const navigate = useNavigate();
@@ -23,6 +25,9 @@ function Home() {
   fetch('http://localhost:8000/api/hello/')
   .then(response => response.json())
   .then(data => console.log(data));
+
+
+  
 
   //state htmlFor both the 1st & 2nd pokemon data (set to null originally)
   //pokedata will hold the data htmlFor the state
@@ -55,7 +60,7 @@ function Home() {
   if(!pokedata) return <p>Loading ..</p>;
 
   console.log(pokedata);
-//  console.log(pokedata2);
+  console.log(pokedata2);
 
   function Stat_Bar({stat_value}){
 
@@ -266,7 +271,7 @@ function Home() {
         </div>
       </div>
       <div className="col-4 border">
-        <form className="d-flex flex-column justify-content-start align-items-start">
+        <form className="d-flex flex-column justify-content-start align-items-start" >
           <label htmlFor="pokemon1">Pokemon 1</label>
           <input type="text" id="pokemon1"></input>
           <label htmlFor="pokemon2"> Pokemon 2</label>

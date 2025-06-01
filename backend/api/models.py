@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 # Manager handles user creation
+#if you want to make your own custom user model, you have to use a manager
 class CustomUserManager(BaseUserManager):
     #creates regular users
         #required fields
@@ -45,9 +46,23 @@ class CustomUser(AbstractBaseUser):
     objects = CustomUserManager()
 
     #tells Django to use username as login field
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = "username"
 
     #print user to console or admin
     def __str__(self):
         return self.username
 
+#pokemon information
+
+class SoulLink(models.model):
+    #one to one with user
+    #if customuser is deleted, so is the soul link entries
+    user=models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="soullink")
+
+    #columns used in the database
+    pokemon1 = models.CharField(max_length=150, unique=True)
+    pokemon2 = models.CharField(max_length=150, unique=True)
+    route = models.CharField(max_length=150, unique=True)
+
+    def __str__(self):
+        return f"{self.pokemon1} and {self.pokemon2}"

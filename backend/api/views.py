@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 #allows login view unauthorized access
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-
+from models import SoulLink
 #base class for making classbased views in Django REST Framework
 from rest_framework.views import APIView
 #Used to return JSON Responses from API
@@ -16,7 +16,7 @@ from rest_framework import status
 #JWT tokens
 from rest_framework_simplejwt.tokens import RefreshToken
 #serializers
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import RegisterSerializer, LoginSerializer, SoulLinkSerializer
 
 @api_view(['GET'])
 def hello_world(request):
@@ -70,3 +70,39 @@ class LoginView(APIView):
             print("Serializer errors:", serializer.errors)
         #fail response (invalid login)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class SoulLinkView(APIView):
+
+    permission_classes = [AllowAny]
+
+    #grab the soullink information
+    def get(self, request):
+        #get the soulink data
+        #check if the soullink object exists for the user
+        #check the soullink data for the person/user currently requesting
+        # - means ignore the created flag
+        soullink, _ = SoulLink.objects.get_or_create(user=request.user)
+        #convert the model to JSON w/ serializer
+        serializer = SoulLinkSerializer(soullink)
+
+        #return serialized data with API resposne
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    #send the soullink information 
+    def post(self, request):
+        #check if the soullink exists for the user and creates it if it doesn't
+        soullink, _ = SoulLink.objects.get_or_create(user=request.user)
+        #load incoming data into serializer
+        serializer = SoulLinkSerializer(soullink, data=request.data)
+
+        #checks if fields are present, and if format is correct
+        if serializer.is_valid():
+            #save the data into the database
+            serializer.save()
+            #returns success message and updated data
+            return Response({"message":"soullink was sent successfully", 
+                             "data": serializer.data}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+

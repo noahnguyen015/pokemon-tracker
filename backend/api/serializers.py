@@ -1,7 +1,7 @@
 #define forms for the API
 from rest_framework import serializers
 #use our User model
-from .models import CustomUser
+from .models import CustomUser, SoulLink
 from django.contrib.auth import authenticate
 
 
@@ -20,6 +20,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['username', 'password']
 
     #Called when .save() on serializer
+    #requires custom .save() functionality because of hashed password (custom creation of entry)
     #validated_data is the safely inputed fields from user (username, password)
     def create(self, validated_data):
         #calls create_user from models page for user creation/ password hashing
@@ -34,6 +35,7 @@ class LoginSerializer(serializers.Serializer):
 
     #called when .is_valid() is used in views
     #data is incoming data (username & passowrd)
+    #requires custom logic for these because of pasword hashing
     def validate(self, data):
         #Django authenticate function checks if users exists with the data
         user = authenticate(**data)
@@ -42,3 +44,9 @@ class LoginSerializer(serializers.Serializer):
             return user
         #fail = HTTP 400
         raise serializers.ValidationError("Invalid username or password")
+
+class SoulLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SoulLink
+        fields = ["pokemon1", "pokemon2", "route"]
+
