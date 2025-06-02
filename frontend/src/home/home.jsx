@@ -2,8 +2,6 @@ import { isValidElement, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './home.css'
 
-
-
 function Logout(){
   //hooks have to be called at top of react functions/components not nested functions/conditions
   const navigate = useNavigate();
@@ -11,8 +9,8 @@ function Logout(){
   function logoutSubmit() {
 
     // Remove tokens from localStorage
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
 
     // Redirect to login page
     navigate('/login', { replace: true });
@@ -22,12 +20,101 @@ function Logout(){
 
 function Home() {
 
-  fetch('http://localhost:8000/api/hello/')
-  .then(response => response.json())
-  .then(data => console.log(data));
+  const [linkData, setLinkData] = useState({ pokemon1: '', 
+                                             pokemon2: '', 
+                                             route: 'abundant-shrine'});
+  const [message, setMessage] = useState('');
+  //JWT is stateless, so server doesn't remember who is logged in, so send tokens in request to know who is logged in
+  let accesstoken = localStorage.getItem('access');
+
+  //handlechange takes object e as argument, comes from a input field
+  //setformdata in the function, state setter function to update formData
+  //{} creates new object, with:
+  //spread operator ..., copying all key-value pairs from currentformData object
+  //[e.target.name]: e.target.value overwrites or adds property in object
+  //e.target.name is name of attribute triggering the event
+  //e.target.value is current value of input field (what has been typed)
+
+  const handleChange = e => {
+    setLinkData({ ...linkData, [e.target.name]: e.target.value });
+  };
 
 
-  
+  async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem('refresh');
+
+    if (!refreshToken) {
+      throw new Error("No refresh token found in localStorage.");
+    }
+
+    const response = await fetch('http://localhost:8000/api/token/refresh/', {
+      method: 'POST',      
+      body: JSON.stringify({ refresh: refreshToken }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to refresh token. Possibly expired.");
+    }
+
+    const data = await response.json();
+    localStorage.setItem('access', data.access); // ⬅️ Store new access token
+    return data.access;
+  }
+
+
+  //handleSubmit is arrow function taking e as parameter, it's an event object to represent the submission
+  //async means the function will use await 
+  const handleSubmit = async e => {
+    //prevent page reload
+    e.preventDefault()
+
+    console.log(accesstoken)
+    console.log(linkData)
+
+
+    const response = await fetch('http://localhost:8000/api/soullink/', {
+      method: 'POST',
+      body: JSON.stringify(linkData),
+      headers: { 'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${accesstoken}`,  
+      },
+    });      
+    
+    if (response.status === 401) {
+
+      // Try to refresh and retry
+      try {
+        accesstoken = await refreshAccessToken();
+
+        const retry = await fetch('http://localhost:8000/api/soullink/', {
+          method: 'POST',
+          body: JSON.stringify(linkData),
+          headers: { 'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${accesstoken}`,  
+          },
+        });
+
+        return retry;
+      } catch (err) {
+        console.error("Token refresh failed.");
+        throw err;
+      }
+    }
+
+    const data = await response.json();
+
+    //successful post 
+    if (response.ok) {
+      //display message
+      setMessage(data.message); // "soullink successful message"
+    } else {
+      //display error if didn't work
+      setMessage('Registration failed: ' + JSON.stringify(data));
+    }
+  };
 
   //state htmlFor both the 1st & 2nd pokemon data (set to null originally)
   //pokedata will hold the data htmlFor the state
@@ -155,11 +242,14 @@ function Home() {
         });
       }
 
+      if(routedata)
+        console.log(locations[0].name)
+
       //map all location values to an index for iteration, then return option with the route name
       return (
         <>
-        <select>
-          {locations && locations.map((route, i) => <option key={i}>{route.name}</option>)}
+        <select name="route" value={linkData.route} onChange={handleChange}>
+          {locations && locations.map((route, i) => <option key={i} value={route.name}>{route.name}</option>)}
         </select>
         </>
       );
@@ -271,15 +361,16 @@ function Home() {
         </div>
       </div>
       <div className="col-4 border">
-        <form className="d-flex flex-column justify-content-start align-items-start" >
-          <label htmlFor="pokemon1">Pokemon 1</label>
-          <input type="text" id="pokemon1"></input>
+        <form className="d-flex flex-column justify-content-start align-items-start" onSubmit={handleSubmit}>
+          <label htmlFor="pokemon1" onChange={handleChange} required>Pokemon 1</label>
+          <input type="text" id="pokemon1" name="pokemon1" value={linkData.pokemon1} onChange={handleChange} required></input>
           <label htmlFor="pokemon2"> Pokemon 2</label>
-          <input type="text" id="pokemon2"></input>
+          <input type="text" id="pokemon2" name="pokemon2" value={linkData.pokemon2} onChange={handleChange} required></input>
           <label htmlFor="route"> Choose a Route</label>
             <Routes/>
-          <input type="submit" value ="Enter" className="mt-2"></input>
+          <input type="submit"className="mt-2" value="Enter"></input>
         </form>
+        <div>{message}</div>
       </div>
     </div>
     <div className="row">

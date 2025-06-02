@@ -54,10 +54,10 @@ class CustomUser(AbstractBaseUser):
 
 #pokemon information
 
-class SoulLink(models.model):
+class SoulLink(models.Model):
     #one to one with user
     #if customuser is deleted, so is the soul link entries
-    user=models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="soullink")
+    user=models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="soullink")
 
     #columns used in the database
     pokemon1 = models.CharField(max_length=150, unique=True)

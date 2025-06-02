@@ -6,9 +6,6 @@ function PrivateRoute(){
   const refreshToken = localStorage.getItem('refresh');
   const accessToken = localStorage.getItem('access');
 
-  console.log(refreshToken);
-  console.log(accessToken);
-
   // Check if both tokens exist (or just the one you want to validate)
   const isLoggedIn = refreshToken && accessToken;
 

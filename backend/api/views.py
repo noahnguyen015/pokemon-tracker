@@ -4,9 +4,9 @@ from django.shortcuts import render
 #apiview - 
 from rest_framework.decorators import api_view
 #allows login view unauthorized access
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from models import SoulLink
+from .models import SoulLink
 #base class for making classbased views in Django REST Framework
 from rest_framework.views import APIView
 #Used to return JSON Responses from API
@@ -17,6 +17,8 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 #serializers
 from .serializers import RegisterSerializer, LoginSerializer, SoulLinkSerializer
+
+import json
 
 @api_view(['GET'])
 def hello_world(request):
@@ -44,6 +46,8 @@ class RegisterView(APIView):
 
 #for logging in
 class LoginView(APIView):
+
+    permission_classes = [AllowAny]
 
     #POST request done to /api/login
     def post(self, request):
@@ -89,9 +93,16 @@ class SoulLinkView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     #send the soullink information 
+    #DRF (Django Rest Framework) info: already parsed, handles the JSON string based on Content-Type header, so request data should be dictionary or query dict based on content
     def post(self, request):
-        #check if the soullink exists for the user and creates it if it doesn't
-        soullink, _ = SoulLink.objects.get_or_create(user=request.user)
+        print(request.data)
+
+        #need to convert json --> dictionary
+        sl_data = request.data
+
+        #for get_or_create() check if the soullink exists for the user and creates it if it doesn't
+        #soullink, _ = SoulLink.objects.get_or_create(user=request.user)
+        soullink = SoulLink.objects.create(user=request.user,pokemon1=sl_data["pokemon1"], pokemon2=sl_data["pokemon2"], route=sl_data["route"])
         #load incoming data into serializer
         serializer = SoulLinkSerializer(soullink, data=request.data)
 
