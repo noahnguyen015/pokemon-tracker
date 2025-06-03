@@ -81,13 +81,13 @@ class SoulLinkView(APIView):
 
     #grab the soullink information
     def get(self, request):
-        #get the soulink data
         #check if the soullink object exists for the user
-        #check the soullink data for the person/user currently requesting
-        # - means ignore the created flag
-        soullink, _ = SoulLink.objects.get_or_create(user=request.user)
+        #find all the objects in soullink related to user
+        #many = true (for multiple objects)
+        linkedpokemon = SoulLink.objects.filter(user=request.user)
+
         #convert the model to JSON w/ serializer
-        serializer = SoulLinkSerializer(soullink)
+        serializer = SoulLinkSerializer(linkedpokemon, many=True)
 
         #return serialized data with API resposne
         return Response(serializer.data, status=status.HTTP_200_OK)

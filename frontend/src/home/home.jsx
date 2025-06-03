@@ -24,6 +24,10 @@ function Home() {
                                              pokemon2: '', 
                                              route: 'abundant-shrine'});
   const [message, setMessage] = useState('');
+
+  const[soulData, setSoulData] = useState([]);
+
+
   //JWT is stateless, so server doesn't remember who is logged in, so send tokens in request to know who is logged in
   let accesstoken = localStorage.getItem('access');
 
@@ -40,6 +44,7 @@ function Home() {
   };
 
 
+  //refresh the access token using the refreshtoken 
   async function refreshAccessToken() {
     const refreshToken = localStorage.getItem('refresh');
 
@@ -64,6 +69,39 @@ function Home() {
     return data.access;
   }
 
+  function ShowSoulLink() {
+
+  async function getLinkData(){
+    const response3 = await fetch('http://localhost:8000/api/soullink/', {
+    headers: {'Authorization': `Bearer ${accesstoken}`,  
+    },
+    });
+
+    if(response3.status === 401) {
+            // Try to refresh and retry
+      try {
+        accesstoken = await refreshAccessToken();
+
+        const retry = await fetch('http://localhost:8000/api/soullink/', {
+          headers: {'Authorization': `Bearer ${accesstoken}`,  
+                    },
+        });
+        //return the retry, meaning response = retry once it refreshes the token and tries again
+        return retry;
+      } catch (err) {
+          console.error("Token refresh failed.");
+          throw err;
+      }
+    }
+      
+      const soulLinks = await response3.json();
+      setSoulData(soulLinks);
+    }
+
+    getLinkData();
+  }
+
+
 
   //handleSubmit is arrow function taking e as parameter, it's an event object to represent the submission
   //async means the function will use await 
@@ -73,7 +111,6 @@ function Home() {
 
     console.log(accesstoken)
     console.log(linkData)
-
 
     const response = await fetch('http://localhost:8000/api/soullink/', {
       method: 'POST',
@@ -104,15 +141,17 @@ function Home() {
       }
     }
 
-    const data = await response.json();
+    const reply = await response.json();
 
     //successful post 
     if (response.ok) {
-      //display message
-      setMessage(data.message); // "soullink successful message"
+      //grabs the previous state of setLinkData (first from the GET request and any subsequent POST)
+      setSoulData(prevLinks => [...prevLinks, reply.data])
+      setMessage(reply.message); // "soullink successful message"
+      console.log(reply.data);
     } else {
       //display error if didn't work
-      setMessage('Registration failed: ' + JSON.stringify(data));
+      setMessage('Registration failed: ' + JSON.stringify(reply));
     }
   };
 
@@ -140,9 +179,15 @@ function Home() {
       setPokedata(pokejson);
       setPokedata2(pokejson2);
     }
-      //call the asynch function on render
-      getPokemon();
+
+    //call the async function on render
+    getPokemon();
+    ShowSoulLink();
+
   },[]);
+
+  if(soulData)
+    console.log(soulData);
 
   if(!pokedata) return <p>Loading ..</p>;
 
@@ -190,8 +235,6 @@ function Home() {
   }
   
   function ReturnType({types}){
-
-    console.log(types);
 
     if(types.length == 1){
       return (
@@ -242,9 +285,6 @@ function Home() {
         });
       }
 
-      if(routedata)
-        console.log(locations[0].name)
-
       //map all location values to an index for iteration, then return option with the route name
       return (
         <>
@@ -253,7 +293,6 @@ function Home() {
         </select>
         </>
       );
-
   }
 
   return (
@@ -371,6 +410,7 @@ function Home() {
           <input type="submit"className="mt-2" value="Enter"></input>
         </form>
         <div>{message}</div>
+        {soulData && soulData.map((link, i) => <div key={i} value={link}>{link.pokemon1} {link.route} {link.pokemon2}</div>)}
       </div>
     </div>
     <div className="row">
