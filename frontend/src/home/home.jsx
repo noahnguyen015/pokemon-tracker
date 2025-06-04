@@ -1,4 +1,4 @@
-import { isValidElement, useEffect, useState } from 'react'
+import { isValidElement, useEffect, useState, memo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './home.css'
 
@@ -20,11 +20,13 @@ function Logout(){
 
 function Home() {
 
+  //for the form, setting up link
   const [linkData, setLinkData] = useState({ pokemon1: '', 
                                              pokemon2: '', 
                                              route: 'abundant-shrine'});
   const [message, setMessage] = useState('');
-
+  
+  //all the existing links :)
   const[soulData, setSoulData] = useState([]);
 
 
@@ -40,7 +42,9 @@ function Home() {
   //e.target.value is current value of input field (what has been typed)
 
   const handleChange = e => {
-    setLinkData({ ...linkData, [e.target.name]: e.target.value });
+    //destructuring
+    const {name, value} = e.target //map two variables name and value to e.target (which is the DOM element <input>/<select> where event occured) (e.target has .name and .value)
+    setLinkData({...linkData, [name] : value });
   };
 
 
@@ -69,13 +73,16 @@ function Home() {
     return data.access;
   }
 
-  function ShowSoulLink() {
+  function getSoulLink() {
 
   async function getLinkData(){
-    const response3 = await fetch('http://localhost:8000/api/soullink/', {
+
+    let response3 = await fetch('http://localhost:8000/api/soullink/', {
     headers: {'Authorization': `Bearer ${accesstoken}`,  
     },
     });
+    //const soulLinks = await response3.json();
+    //setSoulData(prevLinks => [...prevLinks, soulLinks]);
 
     if(response3.status === 401) {
             // Try to refresh and retry
@@ -83,20 +90,25 @@ function Home() {
         accesstoken = await refreshAccessToken();
 
         const retry = await fetch('http://localhost:8000/api/soullink/', {
-          headers: {'Authorization': `Bearer ${accesstoken}`,  
-                    },
+          headers: {'Authorization': `Bearer ${accesstoken}`,},
         });
         //return the retry, meaning response = retry once it refreshes the token and tries again
-        return retry;
+        const tryAgain = await retry.json();
+        
+        if(retry.ok){
+          setSoulData(tryAgain);
+        }
       } catch (err) {
           console.error("Token refresh failed.");
           throw err;
       }
     }
-      
-      const soulLinks = await response3.json();
+    const soulLinks = await response3.json();
+
+    if(response3.ok){
       setSoulData(soulLinks);
     }
+  }
 
     getLinkData();
   }
@@ -182,17 +194,65 @@ function Home() {
 
     //call the async function on render
     getPokemon();
-    ShowSoulLink();
+    getSoulLink();
 
   },[]);
 
-  if(soulData)
-    console.log(soulData);
+  //if(soulData.length != 0)
+  //  console.log(soulData);
 
   if(!pokedata) return <p>Loading ..</p>;
 
-  console.log(pokedata);
-  console.log(pokedata2);
+  //console.log(pokedata);
+  //console.log(pokedata2);
+
+
+  function ShowPair(){
+
+    const[allLinks, setallLinks] = useState([]);
+
+    async function fetchPokemon(pokemon_name1, pokemon_name2, route){
+
+      const res1 = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon_name1}`);
+      const pokemon1 = await res1.json();
+
+      const res2 = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon_name2}`);
+      const pokemon2 = await res2.json();
+
+      return {pokemon1, pokemon2, route};
+      
+    }
+
+    useEffect(() => {
+
+    async function handlePokemon(){
+
+      let tempLinks = [];
+
+      for(const soullink of soulData){
+        const pokedata = await fetchPokemon(soullink.pokemon1, soullink.pokemon2, soullink.route);
+        tempLinks.push(pokedata);
+      }
+
+      setallLinks(tempLinks);
+    }
+
+      handlePokemon();
+    },[]);
+
+    return (
+      <>
+        {allLinks && allLinks.map((link, i) => 
+        <div key ={i} value={link}>
+          <img src={link["pokemon1"]["sprites"]["versions"]["generation-viii"]["icons"]["front_default"]}/>
+          {link.route} 
+          <img src={link["pokemon2"]["sprites"]["versions"]["generation-viii"]["icons"]["front_default"]}/>
+        </div>
+        )}
+      </>);
+
+  }
+
 
   function Stat_Bar({stat_value}){
 
@@ -289,7 +349,7 @@ function Home() {
       return (
         <>
         <select name="route" value={linkData.route} onChange={handleChange}>
-          {locations && locations.map((route, i) => <option key={i} value={route.name}>{route.name}</option>)}
+          {locations && locations.map((route) => <option key={route.name} value={route.name}>{route.name}</option>)}
         </select>
         </>
       );
@@ -410,7 +470,7 @@ function Home() {
           <input type="submit"className="mt-2" value="Enter"></input>
         </form>
         <div>{message}</div>
-        {soulData && soulData.map((link, i) => <div key={i} value={link}>{link.pokemon1} {link.route} {link.pokemon2}</div>)}
+        <ShowPair/>
       </div>
     </div>
     <div className="row">
