@@ -1,4 +1,4 @@
-import { isValidElement, useEffect, useState, memo } from 'react'
+import React, { isValidElement, useEffect, useState, memo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './home.css'
 
@@ -21,9 +21,11 @@ function Logout(){
 function Home() {
 
   //for the form, setting up link
+  /*
   const [linkData, setLinkData] = useState({ pokemon1: '', 
                                              pokemon2: '', 
                                              route: 'abundant-shrine'});
+  */
   const [message, setMessage] = useState('');
   
   //all the existing links :)
@@ -41,11 +43,13 @@ function Home() {
   //e.target.name is name of attribute triggering the event
   //e.target.value is current value of input field (what has been typed)
 
+  /*
   const handleChange = e => {
     //destructuring
     const {name, value} = e.target //map two variables name and value to e.target (which is the DOM element <input>/<select> where event occured) (e.target has .name and .value)
     setLinkData({...linkData, [name] : value });
   };
+  */
 
 
   //refresh the access token using the refreshtoken 
@@ -113,59 +117,171 @@ function Home() {
     getLinkData();
   }
 
+  const SL_Inputs = ({ type, label, name, value, onChange, RoutesComponent }) => {
+
+    if(type === "select"){
+      return (<>
+        <label htmlFor={name}>{label}</label>
+        <RoutesComponent />
+      </>
+      );
+    }
+    if(type === "submit"){
+      return <input type="submit" className="mt-2" value="Enter"></input>
+    }
+
+    return(<>
+      <label htmlFor={name}>{label}</label>
+      <input type="text" id={name} name={name} value={value} onChange={onChange} required></input>
+    </>
+    );
+  }
+
+  const Memo_SL_Input = memo(SL_Inputs);
+
+  function SL_Form(){
+  
+  
+    //for the form, setting up link
+    const [linkData, setLinkData] = useState({ pokemon1: '', 
+                                              pokemon2: '', 
+                                              route: 'abundant-shrine'});
+  
+    const handleChange = useCallback((e) => {
+    //destructuring
+    const {name, value} = e.target //map two variables name and value to e.target (which is the DOM element <input>/<select> where event occured) (e.target has .name and .value)
+    setLinkData(linkData => ({...linkData, [name] : value }));
+    }, []);
 
 
-  //handleSubmit is arrow function taking e as parameter, it's an event object to represent the submission
-  //async means the function will use await 
-  const handleSubmit = async e => {
-    //prevent page reload
-    e.preventDefault()
+    const handleSubmit = async e => {
+      //prevent page reload
+      e.preventDefault()
 
-    console.log(accesstoken)
-    console.log(linkData)
+      const response = await fetch('http://localhost:8000/api/soullink/', {
+        method: 'POST',
+        body: JSON.stringify(linkData),
+        headers: { 'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accesstoken}`,  
+        },
+      });      
+      
+      if (response.status === 401) {
 
-    const response = await fetch('http://localhost:8000/api/soullink/', {
-      method: 'POST',
-      body: JSON.stringify(linkData),
-      headers: { 'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${accesstoken}`,  
-      },
-    });      
-    
-    if (response.status === 401) {
+        // Try to refresh and retry
+        try {
+          accesstoken = await refreshAccessToken();
 
-      // Try to refresh and retry
-      try {
-        accesstoken = await refreshAccessToken();
+          const retry = await fetch('http://localhost:8000/api/soullink/', {
+            method: 'POST',
+            body: JSON.stringify(linkData),
+            headers: { 'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accesstoken}`,  
+            },
+          });
 
-        const retry = await fetch('http://localhost:8000/api/soullink/', {
-          method: 'POST',
-          body: JSON.stringify(linkData),
-          headers: { 'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${accesstoken}`,  
-          },
-        });
+          const TryAgain = await retry.json();
 
-        return retry;
-      } catch (err) {
-        console.error("Token refresh failed.");
-        throw err;
+          if(retry.ok)
+            setSoulData(prevLinks => [...prevLinks, TryAgain.data]);
+
+          return retry;
+        } catch (err) {
+          console.error("Token refresh failed.");
+          throw err;
+        }
       }
-    }
 
-    const reply = await response.json();
+      const reply = await response.json();
 
-    //successful post 
-    if (response.ok) {
-      //grabs the previous state of setLinkData (first from the GET request and any subsequent POST)
-      setSoulData(prevLinks => [...prevLinks, reply.data])
-      setMessage(reply.message); // "soullink successful message"
-      console.log(reply.data);
-    } else {
-      //display error if didn't work
-      setMessage('Registration failed: ' + JSON.stringify(reply));
-    }
-  };
+      //successful post 
+      if (response.ok) {
+        //grabs the previous state of setLinkData (first from the GET request and any subsequent POST)
+        setSoulData(prevLinks => [...prevLinks, reply.data])
+        setMessage(reply.message); // "soullink successful message"
+        console.log(reply.data);
+      } else {
+        //display error if didn't work
+        setMessage('Registration failed: ' + JSON.stringify(reply));
+      }
+      };
+    
+    //used to make sure not to render unless the routes itself changes
+    const Routes = useCallback(function Routes() {
+
+    const[routedata, setRoute] = useState(null);
+
+    useEffect(() => {
+
+      async function getRoutes(){
+
+        //asynchronously grab the data htmlFor the routes from a region
+        const response = await fetch("https://pokeapi.co/api/v2/region/unova/");
+        const all_routes = await response.json();
+
+        setRoute(all_routes);
+
+      }
+      getRoutes();
+
+    },[]);
+
+      //use array to hold all locations
+      let locations = [];
+
+      if(routedata){
+        locations = routedata.locations;
+        //take the arguments of sort and overwrite for custom function for names
+        locations = locations.sort((a,b) => {
+          if(a.name < b.name)
+            return -1
+          if(a.name > b.name) 
+            return 1;
+          return 0;
+        });
+      }
+
+      //map all location values to an index for iteration, then return option with the route name
+      return (
+        <>
+        <select name="route" value={linkData.route} onChange={handleChange} required>
+          {locations && locations.map((route) => <option key={route.name} value={route.name}>{route.name}</option>)}
+        </select>
+        </>
+      );
+    }, [linkData.route, handleChange]);
+
+    return (
+    <>
+    <form className="d-flex flex-column justify-content-start align-items-start" onSubmit={handleSubmit}>
+      <Memo_SL_Input
+        type="text"
+        label="Pokemon 1"
+        name="pokemon1"
+        value={linkData.pokemon1}
+        onChange={handleChange}
+      />
+      <Memo_SL_Input
+        type="text"
+        label="Pokemon 2"
+        name="pokemon2"
+        value={linkData.pokemon2}
+        onChange={handleChange}
+      />
+      <Memo_SL_Input
+        type="select"
+        label="Choose A Route"
+        name="route"
+        //send a prop over to SL_Input
+        RoutesComponent={Routes}
+      />
+      <Memo_SL_Input
+        type="submit"
+      /> 
+    </form>
+    </>
+    );
+  }
 
   //state htmlFor both the 1st & 2nd pokemon data (set to null originally)
   //pokedata will hold the data htmlFor the state
@@ -198,13 +314,7 @@ function Home() {
 
   },[]);
 
-  //if(soulData.length != 0)
-  //  console.log(soulData);
-
   if(!pokedata) return <p>Loading ..</p>;
-
-  //console.log(pokedata);
-  //console.log(pokedata2);
 
 
   function ShowPair(){
@@ -226,9 +336,10 @@ function Home() {
     useEffect(() => {
 
     async function handlePokemon(){
-
+      //create a temporary array in the useEffect, and it is guranteed to run once, so no stale or duplicate data is called :)
       let tempLinks = [];
 
+      //use for... of... loop to deal with async sequentially
       for(const soullink of soulData){
         const pokedata = await fetchPokemon(soullink.pokemon1, soullink.pokemon2, soullink.route);
         tempLinks.push(pokedata);
@@ -309,50 +420,6 @@ function Home() {
       
     }
   
-  }
-
-  function Routes() {
-
-    const[routedata, setRoute] = useState(null);
-
-    useEffect(() => {
-
-      async function getRoutes(){
-
-        //asynchronously grab the data htmlFor the routes from a region
-        const response = await fetch("https://pokeapi.co/api/v2/region/unova/");
-        const all_routes = await response.json();
-
-        setRoute(all_routes);
-
-      }
-      getRoutes();
-
-    },[]);
-
-      //use array to hold all locations
-      let locations = [];
-
-      if(routedata){
-        locations = routedata.locations;
-        //take the arguments of sort and overwrite for custom function for names
-        locations = locations.sort((a,b) => {
-          if(a.name < b.name)
-            return -1
-          if(a.name > b.name) 
-            return 1;
-          return 0;
-        });
-      }
-
-      //map all location values to an index for iteration, then return option with the route name
-      return (
-        <>
-        <select name="route" value={linkData.route} onChange={handleChange}>
-          {locations && locations.map((route) => <option key={route.name} value={route.name}>{route.name}</option>)}
-        </select>
-        </>
-      );
   }
 
   return (
@@ -460,15 +527,7 @@ function Home() {
         </div>
       </div>
       <div className="col-4 border">
-        <form className="d-flex flex-column justify-content-start align-items-start" onSubmit={handleSubmit}>
-          <label htmlFor="pokemon1" onChange={handleChange} required>Pokemon 1</label>
-          <input type="text" id="pokemon1" name="pokemon1" value={linkData.pokemon1} onChange={handleChange} required></input>
-          <label htmlFor="pokemon2"> Pokemon 2</label>
-          <input type="text" id="pokemon2" name="pokemon2" value={linkData.pokemon2} onChange={handleChange} required></input>
-          <label htmlFor="route"> Choose a Route</label>
-            <Routes/>
-          <input type="submit"className="mt-2" value="Enter"></input>
-        </form>
+        <SL_Form/>    
         <div>{message}</div>
         <ShowPair/>
       </div>
@@ -501,3 +560,13 @@ function Home() {
 export default Home
 /*
 */
+
+  /*
+        <label htmlFor="pokemon1">Pokemon 1</label>
+      <input type="text" id="pokemon1" name="pokemon1" value={linkData.pokemon1} onChange={handleChange} required></input>
+      <label htmlFor="pokemon2"> Pokemon 2</label>
+      <input type="text" id="pokemon2" name="pokemon2" value={linkData.pokemon2} onChange={handleChange} required></input>
+      <label htmlFor="route"> Choose a Route</label>
+        <Routes/>
+      <input type="submit"className="mt-2" value="Enter"></input>
+  */
