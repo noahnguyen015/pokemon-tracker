@@ -1,4 +1,4 @@
-import React, { isValidElement, useEffect, useState, memo, useCallback } from 'react'
+import React, { isValidElement, useEffect, useState, memo, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './home.css'
 
@@ -114,10 +114,10 @@ function Home() {
       setSoulData(soulLinks);
     }
   }
-
     getLinkData();
   }
 
+  //get the components for the form
   const SL_Inputs = ({ type, label, name, value, onChange, RoutesComponent }) => {
 
     if(type === "select"){
@@ -138,6 +138,7 @@ function Home() {
     );
   }
 
+  //external components, use memo
   const Memo_SL_Input = memo(SL_Inputs);
 
   function SL_Form(){
@@ -208,6 +209,8 @@ function Home() {
       };
     
     //used to make sure not to render unless the routes itself changes
+    //useCallback makes sure the identity stays same across render unless changes in items in array
+    //used for form handlers and callbacks
     const Routes = useCallback(function Routes() {
 
     const[routedata, setRoute] = useState(null);
@@ -320,17 +323,18 @@ function Home() {
     //call the async function on render
     if(name1 && name2){
       getPokemon();
-      done = true;
     }
-
-    getSoulLink();
+      getSoulLink();
 
   },[name1, name2]);
 
   //if(!pokedata) return <p>Loading ..</p>;
 
 
-  function ShowPair(){
+  //memo -> skips re-rendering if no changes, useMemo -> memoizes result of function
+  //useMemo caches a value, and recalculate ONLY when it changes
+  //keeps a stable version of an object across renders
+  const ShowPair = useMemo(() => memo(({soulData}) => {
 
     const[allLinks, setallLinks] = useState([]);
 
@@ -362,7 +366,7 @@ function Home() {
     }
 
       handlePokemon();
-    },[]);
+    },[soulData]);
 
     return (
       <>
@@ -375,7 +379,7 @@ function Home() {
         )}
       </>);
 
-  }
+  }), []);
 
   function Stat_Bar({stat_value}){
 
@@ -533,7 +537,7 @@ function Home() {
       <div className="col-4 border">
         <SL_Form/>    
         <div>{message}</div>
-        <ShowPair/>
+        {soulData ? <ShowPair soulData={soulData}/> : <p>No Links Exists</p>}
       </div>
     </div>
     <p>No Pokemon Selected for Trainer1</p>
