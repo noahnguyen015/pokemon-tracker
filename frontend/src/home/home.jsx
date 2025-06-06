@@ -422,6 +422,63 @@ function Home() {
   
   }
 
+  function SL_Display({data}){
+
+    console.log(data);
+
+    return (
+    <>
+      <div><span className="align-text-top"><h4>{data.name}</h4></span></div>
+      <ReturnType types={data.types}/>
+      <div><img src={data["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} className="img-fluid sprite" /></div>
+      <div className="d-flex flex-column align-items-bottom">
+        <div className="row">
+          <div className="col-3">HP</div>
+          <div className="col-6" id="bar_handler">
+            <Stat_Bar stat_value={data.stats[0].base_stat}/>
+          </div>
+          <div className="col-3 d-flex justify-content-start">{data.stats[0].base_stat}</div>
+        </div>
+        <div className="row">
+          <div className="col-3">Attack</div>
+          <div className="col-6" id="bar_handler">
+            <Stat_Bar stat_value={data.stats[1].base_stat}/>
+          </div>
+          <div className="col-3 d-flex justify-content-start">{data.stats[1].base_stat}</div>
+        </div>
+        <div className="row">
+          <div className="col-3">Defense</div>
+          <div className="col-6" id="bar_handler">
+            <Stat_Bar stat_value={data.stats[2].base_stat}/>
+          </div>
+          <div className="col-3 d-flex justify-content-start">{data.stats[2].base_stat}</div>
+        </div>
+        <div className="row">
+          <div className="col-3">Sp. Atk</div>
+          <div className="col-6" id="bar_handler">
+            <Stat_Bar stat_value={data.stats[3].base_stat}/>
+          </div>
+          <div className="col-3 d-flex justify-content-start">{data.stats[3].base_stat}</div>
+        </div>
+        <div className="row">
+          <div className="col-3">Sp. Def</div>
+          <div className="col-6" id="bar_handler">
+            <Stat_Bar stat_value={data.stats[4].base_stat}/>
+          </div>
+          <div className="col-3 d-flex justify-content-start">{data.stats[4].base_stat}</div>
+        </div>
+        <div className="row">
+          <div className="col-3">Speed</div>
+          <div className="col-6" id="bar_handler">
+            <Stat_Bar stat_value={data.stats[5].base_stat}/>
+          </div>
+          <div className="col-3 d-flex justify-content-start">{data.stats[5].base_stat}</div>
+        </div>
+      </div>
+    </>
+    );
+  }
+
   return (
   //parent element (React Fragments) <> & </>:) 
   <>
@@ -429,102 +486,10 @@ function Home() {
     <Logout/>
     <div className="row">
       <div className="col-4 border">
-        <div><span className="align-text-top"><h4>{pokedata.name}</h4></span></div>
-        <ReturnType types={pokedata.types}/>
-        <div><img src={pokedata["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} className="img-fluid sprite" /></div>
-        <div className="d-flex flex-column align-items-bottom">
-          <div className="row">
-            <div className="col-3">HP</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata.stats[0].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata.stats[0].base_stat}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Attack</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata.stats[1].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata.stats[1].base_stat}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Defense</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata.stats[2].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata.stats[2].base_stat}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Sp. Atk</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata.stats[3].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata.stats[3].base_stat}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Sp. Def</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata.stats[4].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata.stats[4].base_stat}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Speed</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata.stats[5].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata.stats[5].base_stat}</div>
-          </div>
-        </div>
+        <SL_Display data={pokedata}/>
       </div>
       <div className="col-4 border">
-        <div><span className="align-text-top"><h4>{pokedata2.name}</h4></span></div>
-        <ReturnType types={pokedata2.types}/>
-        <div><img src={pokedata2["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} className="img-fluid sprite"/></div>
-        <div className="d-flex flex-column align-items-bottom">
-          <div className="row">
-            <div className="col-3">HP</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata2.stats[0].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[0].base_stat}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Attack</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata2.stats[1].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[1].base_stat}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Defense</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata2.stats[2].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[2].base_stat}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Sp. Atk</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata2.stats[3].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[3].base_stat}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Sp. Def</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata2.stats[4].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[4].base_stat}</div>
-          </div>
-          <div className="row">
-            <div className="col-3">Speed</div>
-            <div className="col-6" id="bar_handler">
-              <Stat_Bar stat_value={pokedata2.stats[5].base_stat}/>
-            </div>
-            <div className="col-3 d-flex justify-content-start">{pokedata2.stats[5].base_stat}</div>
-          </div>
-        </div>
+        <SL_Display data={pokedata2}/>
       </div>
       <div className="col-4 border">
         <SL_Form/>    
