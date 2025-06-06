@@ -27,6 +27,7 @@ function Home() {
                                              route: 'abundant-shrine'});
   */
   const [message, setMessage] = useState('');
+  let done = false;
   
   //all the existing links :)
   const[soulData, setSoulData] = useState([]);
@@ -288,33 +289,45 @@ function Home() {
   //setPokedata updates the pokedata
   const [pokedata, setPokedata] = useState(null);
   const [pokedata2, setPokedata2] = useState(null);
+  const [name1, setname1] = useState(null);
+  const [name2, setname2] = useState(null);
 
   //useEffect htmlFor obtaining data from PokeAPI asynchronously
   //runs after component renders
   useEffect(() => {
     async function getPokemon(){
 
-      //asynchronously grab the data htmlFor the pokemon
-      const response = await fetch("https://pokeapi.co/api/v2/pokemon/salamence");
-      const pokejson = await response.json();
+      if(name1 && name2){
 
-      //2nd pokemon data
-      const response2 = await fetch("https://pokeapi.co/api/v2/pokemon/blissey");
-      const pokejson2 = await response2.json();
+        console.log("its going in here!")
+        //asynchronously grab the data htmlFor the pokemon
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name1}`);
+        const pokejson = await response.json();
+
+        //2nd pokemon data
+        const response2 = await fetch(`https://pokeapi.co/api/v2/pokemon/${name2}`);
+        const pokejson2 = await response2.json();
 
 
-      //use the state variable
-      setPokedata(pokejson);
-      setPokedata2(pokejson2);
+        //use the state variable
+        setPokedata(pokejson);
+        setPokedata2(pokejson2);
+        console.log(pokedata);
+        console.log(pokedata2);
+      }
     }
 
     //call the async function on render
-    getPokemon();
+    if(name1 && name2){
+      getPokemon();
+      done = true;
+    }
+
     getSoulLink();
 
-  },[]);
+  },[name1, name2]);
 
-  if(!pokedata) return <p>Loading ..</p>;
+  //if(!pokedata) return <p>Loading ..</p>;
 
 
   function ShowPair(){
@@ -354,7 +367,7 @@ function Home() {
     return (
       <>
         {allLinks && allLinks.map((link, i) => 
-        <div key ={i} value={link}>
+        <div key ={i} value={link} id="list" onClick={() => SL_ChangeDuo(link["pokemon1"]["name"], link["pokemon2"]["name"])}>
           <img src={link["pokemon1"]["sprites"]["versions"]["generation-viii"]["icons"]["front_default"]}/>
           {link.route} 
           <img src={link["pokemon2"]["sprites"]["versions"]["generation-viii"]["icons"]["front_default"]}/>
@@ -363,7 +376,6 @@ function Home() {
       </>);
 
   }
-
 
   function Stat_Bar({stat_value}){
 
@@ -479,6 +491,33 @@ function Home() {
     );
   }
 
+  function SL_Team({data}){
+
+    return(
+    <>
+      <div className="row">
+        <div className="col-8 border">
+          <img src={data["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+          <img src={data["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/> 
+          <img src={data["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+          <img src={data["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+          <img src={data["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+          <img src={data["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
+        </div>
+      </div>
+    </>
+    );
+  }
+
+  function SL_ChangeDuo(duo1, duo2){
+
+    console.log(duo1);
+    console.log(duo2);
+
+    setname1(duo1);
+    setname2(duo2);
+  }
+
   return (
   //parent element (React Fragments) <> & </>:) 
   <>
@@ -486,10 +525,10 @@ function Home() {
     <Logout/>
     <div className="row">
       <div className="col-4 border">
-        <SL_Display data={pokedata}/>
+        {(name1 && name2 && pokedata) ? <SL_Display data={pokedata}/> : <p>No Data</p>}
       </div>
       <div className="col-4 border">
-        <SL_Display data={pokedata2}/>
+        {(name1 && name2 && pokedata2) ? <SL_Display data={pokedata2}/> : <p>No Data</p>}
       </div>
       <div className="col-4 border">
         <SL_Form/>    
@@ -497,26 +536,8 @@ function Home() {
         <ShowPair/>
       </div>
     </div>
-    <div className="row">
-      <div className="col-8 border">
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/> 
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-      </div>
-    </div>
-    <div className="row">
-      <div className="col-8 border">
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-        <img src={pokedata2["sprites"]["other"]["official-artwork"]["front_default"]} className="img-fluid sprite2 rounded-circle border2 px-2 py-2 mx-2"/>
-      </div>
-    </div>
+    <p>No Pokemon Selected for Trainer1</p>
+    <p>No Pokemon Selected for Trainer2</p>
   </div>
   </>
   )
