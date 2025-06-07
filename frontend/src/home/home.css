@@ -12,7 +12,7 @@
 
 .sprite{
     width: 140px;
-    height: 140px;
+    height: 120px;
 }
 
 .sprite2{
@@ -29,13 +29,26 @@
     border: solid;
 }
 
-#list{
+.list{
     cursor: pointer;
 }
 
-#list:hover{
+.list:hover{
+    cursor: pointer;
     background-color: green;
 }
+
+#list_scroll{
+    max-height: 395px;
+    overflow-y: auto;
+}
+
+.type{
+    width: 60px;
+    height: 20px;
+}
+
+
 
 
 

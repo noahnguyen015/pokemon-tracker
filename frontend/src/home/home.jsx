@@ -292,6 +292,8 @@ function Home() {
   //setPokedata updates the pokedata
   const [pokedata, setPokedata] = useState(null);
   const [pokedata2, setPokedata2] = useState(null);
+  const [poketype, setPoketype] = useState(null);
+  const [poketype2, setPoketype2] = useState(null);
   const [name1, setname1] = useState(null);
   const [name2, setname2] = useState(null);
 
@@ -301,9 +303,8 @@ function Home() {
     async function getPokemon(){
 
       if(name1 && name2){
-
-        console.log("its going in here!")
         //asynchronously grab the data htmlFor the pokemon
+        //FOR GENERAL INFORMATION OF POKEMON
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name1}`);
         const pokejson = await response.json();
 
@@ -311,12 +312,40 @@ function Home() {
         const response2 = await fetch(`https://pokeapi.co/api/v2/pokemon/${name2}`);
         const pokejson2 = await response2.json();
 
+        let typelist = [];
+        let typelist2 = [];
 
+        //GET TYPING INFORMATION FOR BOTH POKEMON
+        for (const type of pokejson["types"]){
+          const typechart = await fetch(type["type"]["url"]);
+          const typejson = await typechart.json();
+          
+          //new variable each loop, objects passed by reference, so clearing it = all point to same object
+          let typeinfo = {name: typejson["name"],
+                          damage_relations: typejson["damage_relations"],
+                          sprites: typejson["sprites"],
+                         };
+
+          typelist.push(typeinfo);
+        }
+
+        for (const type of pokejson2["types"]){
+          const typechart2 = await fetch(type["type"]["url"]);
+          const typejson2 = await typechart2.json();
+
+          let typeinfo2 = {name: typejson2["name"],
+                           damage_relations: typejson2["damage_relations"],
+                           sprites: typejson2["sprites"],
+                         };
+
+          typelist2.push(typeinfo2);
+        }
         //use the state variable
         setPokedata(pokejson);
         setPokedata2(pokejson2);
-        console.log(pokedata);
-        console.log(pokedata2);
+
+        setPoketype(typelist);
+        setPoketype2(typelist2);
       }
     }
 
@@ -334,6 +363,11 @@ function Home() {
   //memo -> skips re-rendering if no changes, useMemo -> memoizes result of function
   //useMemo caches a value, and recalculate ONLY when it changes
   //keeps a stable version of an object across renders
+    //by using useMemo, it's created once and is maintained for any other renders until a change
+    //just memo will create a new version of the same component on each render
+  //useMemo makes sure to return the memoized component, so React sees the same component every time, 
+    //useMemo: memoize for function and or component when also inside another component
+  //and memo makes it so it only changes based on props ({})
   const ShowPair = useMemo(() => memo(({soulData}) => {
 
     const[allLinks, setallLinks] = useState([]);
@@ -369,13 +403,13 @@ function Home() {
     },[soulData]);
 
     return (
-      <>
-        {allLinks && allLinks.map((link, i) => 
-        <div key ={i} value={link} id="list" onClick={() => SL_ChangeDuo(link["pokemon1"]["name"], link["pokemon2"]["name"])}>
-          <img src={link["pokemon1"]["sprites"]["versions"]["generation-viii"]["icons"]["front_default"]}/>
-          {link.route} 
-          <img src={link["pokemon2"]["sprites"]["versions"]["generation-viii"]["icons"]["front_default"]}/>
-        </div>
+      <>  
+          {allLinks && allLinks.map((link, i) => 
+          <div key ={i} value={link} className="list" onClick={() => SL_ChangeDuo(link["pokemon1"]["name"], link["pokemon2"]["name"])}>
+            <img src={link["pokemon1"]["sprites"]["versions"]["generation-viii"]["icons"]["front_default"]}/>
+            {link.route} 
+            <img src={link["pokemon2"]["sprites"]["versions"]["generation-viii"]["icons"]["front_default"]}/>
+          </div>
         )}
       </>);
 
@@ -423,29 +457,33 @@ function Home() {
   
   function ReturnType({types}){
 
-    if(types.length == 1){
+    //console.log(types);
+
+    if(types.length == 1) {
+
       return (
       <>
-        <div>{types[0]["type"]["name"]}</div>
+        <div><img className="type"src={types[0]["sprites"]["generation-v"]["black-2-white-2"]["name_icon"]}/></div><br/>
       </>)
-    }else{
+    }else {
+
       return(
       <>
-        <div>{types[0]["type"]["name"]}/{types[1]["type"]["name"]}</div>
+        <div><img className="type" src={types[0]["sprites"]["generation-v"]["black-2-white-2"]["name_icon"]}/><img className="type" src={types[1]["sprites"]["generation-v"]["black-2-white-2"]["name_icon"]}/></div><br/>
       </>)
       
     }
   
   }
 
-  function SL_Display({data}){
+  function SL_Display({data, type}){
 
-    console.log(data);
+    console.log(type);
 
     return (
     <>
       <div><span className="align-text-top"><h4>{data.name}</h4></span></div>
-      <ReturnType types={data.types}/>
+      <ReturnType types={type}/>
       <div><img src={data["sprites"]["versions"]["generation-v"]["black-white"]["animated"]["front_default"]} className="img-fluid sprite" /></div>
       <div className="d-flex flex-column align-items-bottom">
         <div className="row">
@@ -490,6 +528,8 @@ function Home() {
           </div>
           <div className="col-3 d-flex justify-content-start">{data.stats[5].base_stat}</div>
         </div>
+        <div>
+        </div>
       </div>
     </>
     );
@@ -515,29 +555,32 @@ function Home() {
 
   function SL_ChangeDuo(duo1, duo2){
 
-    console.log(duo1);
-    console.log(duo2);
-
     setname1(duo1);
     setname2(duo2);
+  }
+
+  function Types(){
+
   }
 
   return (
   //parent element (React Fragments) <> & </>:) 
   <>
   <div className="container">
-    <Logout/>
+    <div><Logout/></div><br/>
     <div className="row">
       <div className="col-4 border">
-        {(name1 && name2 && pokedata) ? <SL_Display data={pokedata}/> : <p>No Data</p>}
+        {(name1 && name2 && pokedata && poketype) ? <SL_Display data={pokedata} type={poketype}/> : <p>No Data</p>}
       </div>
       <div className="col-4 border">
-        {(name1 && name2 && pokedata2) ? <SL_Display data={pokedata2}/> : <p>No Data</p>}
+        {(name1 && name2 && pokedata2 && poketype2) ? <SL_Display data={pokedata2} type={poketype2}/> : <p>No Data</p>}
       </div>
       <div className="col-4 border">
         <SL_Form/>    
         <div>{message}</div>
+        <div id="list_scroll">
         {soulData ? <ShowPair soulData={soulData}/> : <p>No Links Exists</p>}
+        </div>
       </div>
     </div>
     <p>No Pokemon Selected for Trainer1</p>
